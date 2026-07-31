@@ -287,50 +287,80 @@ function initLangSwitcher() {
 // ── PROFILE DRAWER ────────────────────────────────────────────────────────────
 export async function openProfileDrawer() {
   if (!currentUser) return;
+
   const overlay = document.getElementById('profileDrawerOverlay');
   const drawer = document.getElementById('profileDrawer');
   const nameEl = document.getElementById('drawerName');
   const balEl = document.getElementById('drawerBalance');
   const menu = document.getElementById('drawerMenu');
-  if (nameEl) nameEl.textContent = currentUser.name;
-  const portfolio = await api.portfolio();
 
-let totalPortfolio = Number(portfolio.balance);
+  if (nameEl) {
+    nameEl.textContent = currentUser.name;
+  }
 
-Object.keys(portfolio.prices).forEach(symbol => {
-    totalPortfolio +=
-        (Number(portfolio.wallet[symbol] || 0)) *
-        Number(portfolio.prices[symbol] || 0);
-});
+  // OPEN THE DRAWER IMMEDIATELY
+  if (overlay) overlay.classList.remove('hidden');
+  if (drawer) drawer.classList.add('open');
 
-if (balEl) {
-    balEl.textContent = formatCurrency(totalPortfolio);
-}
+  // Load portfolio balance separately
+  try {
+    const portfolio = await api.portfolio();
+
+    let totalPortfolio = Number(portfolio.balance || 0);
+
+    Object.keys(portfolio.prices || {}).forEach(symbol => {
+      totalPortfolio +=
+        Number(portfolio.wallet?.[symbol] || 0) *
+        Number(portfolio.prices?.[symbol] || 0);
+    });
+
+    if (balEl) {
+      balEl.textContent = formatCurrency(totalPortfolio);
+    }
+  } catch (error) {
+    console.error('Failed to load portfolio for profile drawer:', error);
+
+    if (balEl) {
+      balEl.textContent = '$0.00';
+    }
+  }
+
   if (menu) {
     menu.innerHTML = `
       <div class="drawer-item" onclick="window._navTo('/profile')" style="cursor:pointer;">
-        <span>👤 Profile</span><span style="color:#94a3b8;">›</span>
+        <span>👤 Profile</span>
+        <span style="color:#94a3b8;">›</span>
       </div>
+
       <div class="drawer-item" onclick="window._navTo('/security')" style="cursor:pointer;">
-        <span>🔒 Security</span><span style="color:#94a3b8;">›</span>
+        <span>🔒 Security</span>
+        <span style="color:#94a3b8;">›</span>
       </div>
+
       <div class="drawer-item" onclick="window._navTo('/transactions')" style="cursor:pointer;">
-        <span>📋 Transactions</span><span style="color:#94a3b8;">›</span>
+        <span>📋 Transactions</span>
+        <span style="color:#94a3b8;">›</span>
       </div>
+
       <div class="drawer-item" onclick="window._navTo('/referral')" style="cursor:pointer;">
-        <span>🎁 Referral</span><span style="color:#94a3b8;">›</span>
+        <span>🎁 Referral</span>
+        <span style="color:#94a3b8;">›</span>
       </div>
+
       <div style="padding:20px 0 0;">
-        <button class="btn btn-danger btn-w100" id="drawer-logout-btn">↪ ${t('logout')}</button>
+        <button class="btn btn-danger btn-w100" id="drawer-logout-btn">
+          ↪ ${t('logout')}
+        </button>
       </div>
     `;
-    document.getElementById('drawer-logout-btn')?.addEventListener('click', async () => {
-      await api.logout();
-      location.reload();
-    });
+
+    document
+      .getElementById('drawer-logout-btn')
+      ?.addEventListener('click', async () => {
+        await api.logout();
+        location.reload();
+      });
   }
-  if (overlay) overlay.classList.remove('hidden');
-  if (drawer) drawer.classList.add('open');
 }
 
 window._navTo = (path) => { closeProfileDrawer(); navigate(path); };
