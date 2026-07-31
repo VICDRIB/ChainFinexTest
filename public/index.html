@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChainFinex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- AUTH PAGES (login / register) — full-page dark layout -->
+  <div id="auth-root" class="auth-root hidden"></div>
+
+  <!-- Toast notifications -->
+  <div id="toast-container"></div>
+
+  <!-- APP SHELL — sidebar + content -->
+  <div id="app-shell" class="app-shell hidden">
+
+    <!-- Sidebar (desktop) -->
+    <aside id="sidebar" class="sidebar desktop-sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark">
+            <img src="/logos/logo.png" alt="ChainFinex Logo">
+        </div>
+        <span class="logo-text">ChainFinex</span>
+    </div>
+      <nav class="sidebar-nav" id="sidebar-nav"></nav>
+      <div class="sidebar-user" id="sidebar-user"></div>
+    </aside>
+
+    <!-- Mobile drawer backdrop -->
+    <div id="drawer-backdrop" class="drawer-backdrop" onclick="closeMobileDrawer()"></div>
+
+    <!-- Mobile drawer -->
+    <aside id="mobile-drawer" class="sidebar mobile-drawer hidden">
+      <div class="sidebar-logo" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="logo-mark">
+              <img src="/logos/logo.png" alt="ChainFinex Logo">
+          </div>
+          <span class="logo-text">ChainFinex</span>
+      </div>
+        <button class="drawer-close-btn" onclick="closeMobileDrawer()">✕</button>
+      </div>
+      <nav class="sidebar-nav" id="mobile-nav"></nav>
+      <div class="sidebar-user" id="mobile-user"></div>
+    </aside>
+
+    <!-- Admin Mobile Drawer -->
+    <aside id="admin-mobile-drawer" class="sidebar mobile-drawer hidden">
+      <div class="sidebar-logo" style="justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="logo-mark">
+                <img src="/logos/logo.png" alt="ChainFinex Logo">
+            </div>
+            <span class="logo-text">Admin</span>
+          </div>
+        </div>
+        <button class="drawer-close-btn" onclick="closeAdminDrawer()">✕</button>
+      </div>
+      <nav class="sidebar-nav" id="admin-mobile-nav"></nav>
+      <div class="sidebar-user" id="admin-mobile-user"></div>
+    </aside>
+
+    <!-- Main area -->
+    <div class="main-area">
+
+      <!-- Desktop header -->
+      <header class="top-header desktop-header">
+        <div class="header-left">
+          <!-- Empty on Desktop -->
+        </div>
+        <div class="header-right">
+          <!-- Language switcher -->
+          <div class="lang-switcher" id="lang-switcher">
+            <button class="lang-btn" id="lang-btn">
+              <span id="lang-flag">🇺🇸</span>
+              <span id="lang-name">EN</span>
+              <span style="font-size:10px;color:#94a3b8;">▼</span>
+            </button>
+            <div class="lang-dropdown hidden" id="lang-dropdown"></div>
+          </div>
+          <div id="desktop-user"></div>
+        </div>
+      </header>
+
+      <!-- Mobile header -->
+      <header class="top-header mobile-header">
+        <div class="header-left">
+          <button id="sidebarToggle2" class="sidebar-toggle">☰</button>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="logo-mark" style="width:26px;height:26px;">
+              <img src="/logos/logo.png" alt="ChainFinex Logo">
+          </div>
+            <span style="font-weight:700;color:#0f172a;font-size:14px;">ChainFinex</span>
+          </div>
+        </div>
+        <div class="header-right" style="gap:8px;">
+          <!-- Mobile lang switcher -->
+          <div class="lang-switcher" id="mobile-lang-switcher">
+            <button class="lang-btn" id="mobile-lang-btn" style="padding:5px 9px;">
+              <span id="mobile-lang-flag">🇺🇸</span>
+              <span style="font-size:10px;color:#94a3b8;">▼</span>
+            </button>
+            <div class="lang-dropdown hidden" id="mobile-lang-dropdown"></div>
+          </div>
+          <div id="mobile-header-user"></div>
+        </div>
+      </header>
+
+      <!-- Page content -->
+      <div class="page-content" id="page-content">
+        <div class="page-inner">
+          <div class="loading-spinner-wrap"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Profile / User Drawer -->
+  <div id="profileDrawerOverlay" class="drawer-overlay hidden"></div>
+  <div id="profileDrawer" class="profile-drawer">
+    <div class="drawer-header">
+      <div>
+        <div id="drawerName" class="drawer-name">User</div>
+        <div class="drawer-online">🟢 Online</div>
+        <div id="drawerBalance" class="drawer-balance">$0.00</div>
+      </div>
+      <button class="drawer-close" onclick="closeProfileDrawer()">✕</button>
+    </div>
+    <div class="drawer-menu" id="drawerMenu"></div>
+  </div>
+
+  <!-- Plan Drawer -->
+  <div id="planDrawerOverlay" class="drawer-overlay hidden"></div>
+  <div id="planDrawer" class="profile-drawer">
+    <div class="drawer-header">
+      <div>
+        <div id="planDrawerTitle" class="drawer-name">Plan</div>
+        <div id="planDrawerStatus" class="drawer-online"></div>
+      </div>
+      <button class="drawer-close" onclick="document.getElementById('planDrawer').classList.remove('open');document.getElementById('planDrawerOverlay').classList.add('hidden');">✕</button>
+    </div>
+    <div id="planDrawerContent" class="drawer-menu"></div>
+  </div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
