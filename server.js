@@ -1843,5 +1843,4 @@ app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.ht
 // ── START ─────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`\n🚀 ChainFinex running at http://localhost:${PORT}`);
-  console.log(`   Admin: admin@ChainFinex.io / password`);
 });
