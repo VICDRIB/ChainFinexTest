@@ -187,12 +187,10 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    secure: false,
     maxAge: 7 * 24 * 60 * 60 * 1000
   }
 }));
-
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 app.post('/api/auth/register', async (req, res) => {
   try {
