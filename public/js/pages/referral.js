@@ -1,3 +1,4 @@
+import {toast } from "../app.js";
 import api from '../api.js';
 
 export async function render(container) {
@@ -93,6 +94,6 @@ export async function render(container) {
     .getElementById('copy-link')
     .addEventListener('click', async () => {
       await navigator.clipboard.writeText(link);
-      alert('Referral link copied.');
+      toast('Referral link copied.');
     });
 }
