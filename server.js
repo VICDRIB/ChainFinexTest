@@ -1453,9 +1453,18 @@ app.post('/api/swap', async (req, res) => {
     const afterFee = usdValue - fee;
 
     const [userRes, walletRes] = await Promise.all([
-      supabase.from('users').select('balance').eq('id', req.session.userId).single(),
-      supabase.from('wallets').select('*').eq('user_id', req.session.userId).single(),
-    ]);
+  supabase
+    .from('users')
+    .select('balance')
+    .eq('id', req.session.userId)
+    .maybeSingle(),
+
+  supabase
+    .from('wallets')
+    .select('*')
+    .eq('user_id', req.session.userId)
+    .maybeSingle(),
+]);
     if (userRes.error) throw userRes.error;
     if (walletRes.error) throw walletRes.error;
 
